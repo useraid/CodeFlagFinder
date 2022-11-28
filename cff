@@ -1,0 +1,47 @@
+#!/bin/bash
+
+weburl=$1
+flag_head=$2
+folder_name=$(echo $weburl | sed -e 's/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/')
+
+url_chk(){
+if [[ $weburl == "--help"||"-h" ]] && [[ -z $flag_head ]]
+then
+    echo -e "Usage - ./cff <http://URL> <FLAG HEADER>\neg - ./cff hackthis.tryhackme.com THM"
+    exit 0   
+
+elif [[ $weburl != http?(s)://* ]]
+then
+    echo "Enter valid URL with http/https"
+    exit 1
+ 
+fi
+
+if [[ -z $flag_head ]]
+then 
+    echo "Enter flag header you need to search for"
+    exit 1
+fi
+
+}
+
+site_pull(){
+    echo "Pulling the site"
+    wget -rk $weburl -q --show-progress
+    
+}
+
+finderrun(){
+    grep_out=$(grep -rni "$flag_head" $folder_name)
+    if [[ -z grep_out ]]
+    then
+        echo "Nothing Found"
+    else 
+        echo -e "\n$flag_head found\n\n"
+        grep -rni "$flag_head" $folder_name
+    fi
+
+}
+
+# Runner
+url_chk&&site_pull&&finderrun
